@@ -51,7 +51,6 @@ PREMIUM_FILE_LIMIT = 100  # Premium users can merge up to 100 files
 # Valid premium keys (in production, use a database)
 VALID_PREMIUM_KEYS = {
     "PREMIUM2026": {"email": "premium_user@example.com", "valid_until": "2026-12-31"},
-    # Add more keys as needed
 }
 
 def verify_premium_key(key):
@@ -67,7 +66,6 @@ def merge_pdfs(files):
         
         for uploaded_file in files:
             pdf_reader = PyPDF2.PdfReader(uploaded_file)
-            # Create a file-like object
             merger.append(uploaded_file)
         
         # Write to bytes
@@ -207,74 +205,73 @@ else:
     )
 
     if uploaded_files:
-    st.success(f"✅ {len(uploaded_files)} file(s) selected")
-    
-    # Check file limit
-    if len(uploaded_files) > file_limit:
-        st.error(f"❌ You can only merge up to {file_limit} files. {len(uploaded_files)} files selected.")
-        if not st.session_state.is_premium:
-            st.warning(f"💡 Upgrade to Premium to merge up to {PREMIUM_FILE_LIMIT} files!")
-    else:
-        # Display file list
-        with st.expander("View selected files"):
-            for i, file in enumerate(uploaded_files, 1):
-                st.write(f"{i}. {file.name} ({file.size / 1024:.1f} KB)")
+        st.success(f"✅ {len(uploaded_files)} file(s) selected")
         
-        # Merge button
-        col1, col2, col3 = st.columns([2, 1, 1])
-        
-        with col1:
-            output_name = st.text_input(
-                "Output filename",
-                value="merged_document.pdf",
-                help="Name for your merged PDF"
-            )
-        
-        with col2:
-            merge_button = st.button("🔗 Merge PDFs", use_container_width=True, type="primary")
-        
-        if merge_button:
-            if not output_name.endswith('.pdf'):
-                output_name += '.pdf'
+        # Check file limit
+        if len(uploaded_files) > file_limit:
+            st.error(f"❌ You can only merge up to {file_limit} files. {len(uploaded_files)} files selected.")
+            if not st.session_state.is_premium:
+                st.warning(f"💡 Upgrade to Premium to merge up to {PREMIUM_FILE_LIMIT} files!")
+        else:
+            # Display file list
+            with st.expander("View selected files"):
+                for i, file in enumerate(uploaded_files, 1):
+                    st.write(f"{i}. {file.name} ({file.size / 1024:.1f} KB)")
             
-            with st.spinner("🔄 Merging PDFs..."):
-                merged_pdf = merge_pdfs(uploaded_files)
+            # Merge button
+            col1, col2, col3 = st.columns([2, 1, 1])
             
-            if merged_pdf:
-                st.success("✅ PDFs merged successfully!")
+            with col1:
+                output_name = st.text_input(
+                    "Output filename",
+                    value="merged_document.pdf",
+                    help="Name for your merged PDF"
+                )
+            
+            with col2:
+                merge_button = st.button("🔗 Merge PDFs", use_container_width=True, type="primary")
+            
+            if merge_button:
+                if not output_name.endswith('.pdf'):
+                    output_name += '.pdf'
                 
-                # Update counter
-                st.session_state.files_merged_today += 1
+                with st.spinner("🔄 Merging PDFs..."):
+                    merged_pdf = merge_pdfs(uploaded_files)
                 
-                # Download button
-                col1, col2 = st.columns([3, 1])
-                with col1:
-                    st.download_button(
-                        label="📥 Download Merged PDF",
-                        data=merged_pdf,
-                        file_name=output_name,
-                        mime="application/pdf",
-                        use_container_width=True
-                    )
-                
-                # Show file info
-                col1, col2 = st.columns(2)
-                with col1:
-                    st.info(f"📊 Output size: {len(merged_pdf.getvalue()) / 1024:.1f} KB")
-                with col2:
-                    st.info(f"📄 Total pages merged: {len(uploaded_files)}")
-                
-                # Set merge complete flag
-                st.session_state.merge_complete = True
-                
-                st.divider()
-                st.success("""
-                🔐 **Deleting Files...**
-                
-                ✅ All uploaded files are being deleted
-                ✅ Only your merged PDF is saved for download
-                ✅ Check the page for the 'Merge More PDFs' button to continue
-                """)
+                if merged_pdf:
+                    st.success("✅ PDFs merged successfully!")
+                    
+                    # Update counter
+                    st.session_state.files_merged_today += 1
+                    
+                    # Download button
+                    col1, col2 = st.columns([3, 1])
+                    with col1:
+                        st.download_button(
+                            label="📥 Download Merged PDF",
+                            data=merged_pdf,
+                            file_name=output_name,
+                            mime="application/pdf",
+                            use_container_width=True
+                        )
+                    
+                    # Show file info
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.info(f"📊 Output size: {len(merged_pdf.getvalue()) / 1024:.1f} KB")
+                    with col2:
+                        st.info(f"📄 Total pages merged: {len(uploaded_files)}")
+                    
+                    # Set merge complete flag
+                    st.session_state.merge_complete = True
+                    
+                    st.divider()
+                    st.success("""
+                    🔐 **Deleting Files...**
+                    
+                    ✅ All uploaded files are being deleted
+                    ✅ Only your merged PDF is saved for download
+                    """)
 
 st.divider()
 
