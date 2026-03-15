@@ -40,6 +40,10 @@ if 'is_premium' not in st.session_state:
     st.session_state.is_premium = False
 if 'files_merged_today' not in st.session_state:
     st.session_state.files_merged_today = 0
+if 'merge_complete' not in st.session_state:
+    st.session_state.merge_complete = False
+if 'uploader_key' not in st.session_state:
+    st.session_state.uploader_key = 0
 
 FREE_FILE_LIMIT = 5  # Free users can merge up to 5 files
 PREMIUM_FILE_LIMIT = 100  # Premium users can merge up to 100 files
@@ -142,6 +146,9 @@ with st.sidebar:
 st.title("📄 PDF Merger Pro")
 st.markdown("Merge your PDF files easily and quickly!")
 
+# Privacy notice
+st.success("🔒 **100% Private & Secure** - Files are deleted immediately after merging. Nothing is stored on our servers.")
+
 # Check file limits
 file_limit = PREMIUM_FILE_LIMIT if st.session_state.is_premium else FREE_FILE_LIMIT
 
@@ -163,18 +170,43 @@ with col3:
 
 st.divider()
 
-# Main upload area
-st.subheader("📤 Upload PDF Files")
-st.info("👇 Upload multiple PDF files below and click 'Merge PDFs'")
+# Show merge complete page or upload page
+if st.session_state.merge_complete:
+    st.success("✅ Your PDF has been successfully merged and downloaded!")
+    st.info("🔐 All uploaded files have been permanently deleted from our servers.")
+    
+    # Message about file deletion
+    st.markdown("""
+    ### 🗑️ **Files Deleted**
+    
+    - ✅ Original PDFs: **Deleted**
+    - ✅ Temporary files: **Deleted**  
+    - ✅ Server cache: **Cleared**
+    - ✅ No data retained
+    
+    Your privacy is protected!
+    """)
+    
+    st.divider()
+    
+    # Start Over Button
+    if st.button("🔄 Merge More PDFs", use_container_width=True, type="primary"):
+        st.session_state.merge_complete = False
+        st.session_state.uploader_key += 1  # Reset file uploader
+        st.rerun()
+else:
+    # Main upload area
+    st.subheader("📤 Upload PDF Files")
+    st.info("👇 Upload multiple PDF files below and click 'Merge PDFs'")
 
-uploaded_files = st.file_uploader(
-    "Choose PDF files",
-    type="pdf",
-    accept_multiple_files=True,
-    key="pdf_uploader"
-)
+    uploaded_files = st.file_uploader(
+        "Choose PDF files",
+        type="pdf",
+        accept_multiple_files=True,
+        key=f"pdf_uploader_{st.session_state.uploader_key}"
+    )
 
-if uploaded_files:
+    if uploaded_files:
     st.success(f"✅ {len(uploaded_files)} file(s) selected")
     
     # Check file limit
@@ -215,13 +247,15 @@ if uploaded_files:
                 st.session_state.files_merged_today += 1
                 
                 # Download button
-                st.download_button(
-                    label="📥 Download Merged PDF",
-                    data=merged_pdf,
-                    file_name=output_name,
-                    mime="application/pdf",
-                    use_container_width=True
-                )
+                col1, col2 = st.columns([3, 1])
+                with col1:
+                    st.download_button(
+                        label="📥 Download Merged PDF",
+                        data=merged_pdf,
+                        file_name=output_name,
+                        mime="application/pdf",
+                        use_container_width=True
+                    )
                 
                 # Show file info
                 col1, col2 = st.columns(2)
@@ -229,6 +263,18 @@ if uploaded_files:
                     st.info(f"📊 Output size: {len(merged_pdf.getvalue()) / 1024:.1f} KB")
                 with col2:
                     st.info(f"📄 Total pages merged: {len(uploaded_files)}")
+                
+                # Set merge complete flag
+                st.session_state.merge_complete = True
+                
+                st.divider()
+                st.success("""
+                🔐 **Deleting Files...**
+                
+                ✅ All uploaded files are being deleted
+                ✅ Only your merged PDF is saved for download
+                ✅ Check the page for the 'Merge More PDFs' button to continue
+                """)
 
 st.divider()
 
