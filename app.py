@@ -134,7 +134,7 @@ with st.sidebar:
     st.markdown("""
     ### Get Premium Key
     💌 [Contact us](mailto:mujitha.m3@example.com)
-    🛒 [Buy now - $9.99](https://buy.stripe.com/aFa4gydGr1Iq2Yabs2gnK00)
+    🛒 [Buy now - $1.99](https://buy.stripe.com/aFa4gydGr1Iq2Yabs2gnK00)
     """)
     
     st.divider()
