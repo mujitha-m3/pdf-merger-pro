@@ -133,8 +133,8 @@ with st.sidebar:
     # Contact/Buy
     st.markdown("""
     ### Get Premium Key
-    💌 [Contact us](mailto:your-email@example.com)
-    🛒 [Buy now](https://your-payment-link.com)
+    💌 [Contact us](mailto:mujitha.m3@example.com)
+    🛒 [Buy now - $9.99](https://buy.stripe.com/aFa4gydGr1Iq2Yabs2gnK00)
     """)
     
     st.divider()
@@ -164,7 +164,7 @@ with col2:
 
 with col3:
     if not st.session_state.is_premium:
-        st.info("🚀 [Upgrade to Premium](https://your-payment-link.com)")
+        st.info("🚀 [Upgrade to Premium](https://buy.stripe.com/aFa4gydGr1Iq2Yabs2gnK00)")
 
 st.divider()
 
